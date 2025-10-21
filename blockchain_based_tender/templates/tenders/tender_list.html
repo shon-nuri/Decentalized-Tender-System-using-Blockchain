@@ -1,0 +1,69 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %}Список Активных Тендеров{% endblock %}
+
+{% block content %}
+<h1 class="header-title">Список Активных Тендеров ({{ tenders|length }})</h1>
+<hr>
+
+{% if user.is_authenticated %}
+    <div style="margin-bottom: 25px; text-align: right;">
+        <a href="{% url 'tender_create' %}" 
+           class="main-button" 
+           style="background-color: #28a745; padding: 10px 20px; font-size: 1em; border-radius: 5px; text-decoration: none; color: white; display: inline-block;">
+            + Создать Новый Тендер
+        </a>
+    </div>
+{% endif %}
+
+{% if not tenders %}
+    <div style="padding: 20px; background-color: #f8f9fa; border: 1px dashed #ccc; text-align: center;">
+        <p>В настоящее время активных тендеров нет.</p>
+        {% if user.is_authenticated %}
+            <p>Вы можете создать новый тендер, используя кнопку выше.</p>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="tender-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        {% for tender in tenders %}
+            <div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; background-color: white; display: flex; flex-direction: column; height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="color: #007bff; margin-top: 0; margin-bottom: 10px; font-size: 1.2em; min-height: 60px;">
+                    <a href="{% url 'tender_detail' pk=tender.pk %}" style="text-decoration: none; color: #007bff;">
+                        {{ tender.title }}
+                    </a>
+                </h3>
+                
+                <div style="flex-grow: 1;">
+                    <p style="font-size: 0.9em; color: #6c757d; margin-bottom: 8px;">
+                        <strong>Создатель:</strong> {{ tender.creator.company_name|default:tender.creator.username }}
+                    </p>
+                    <p style="margin-bottom: 8px;">
+                        <strong>Бюджет:</strong> {{ tender.budget }}
+                    </p>
+                    <p style="margin-bottom: 8px;">
+                        <strong>Статус:</strong> 
+                        <span style="font-weight: bold; 
+                            {% if tender.status == 'active' %}color: #28a745;
+                            {% elif tender.status == 'closed' %}color: #dc3545;
+                            {% elif tender.status == 'awarded' %}color: #ffc107;
+                            {% else %}color: #6c757d;{% endif %}">
+                            {{ tender.get_status_display }}
+                        </span>
+                    </p>
+                    <p style="margin-bottom: 0;">
+                        <strong>Срок:</strong> {{ tender.deadline|date:"d.m.Y H:i" }}
+                    </p>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <a href="{% url 'tender_detail' pk=tender.pk %}" 
+                       style="display: block; padding: 10px; background-color: #007bff; color: white; text-align: center; border-radius: 4px; text-decoration: none; font-weight: 500;">
+                        📋 Подробнее
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

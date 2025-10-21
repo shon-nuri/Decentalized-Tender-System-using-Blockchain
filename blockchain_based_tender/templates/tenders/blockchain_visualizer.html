@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Визуализатор Блокчейна{% endblock %}
+
+{% block content %}
+
+<style>
+    .block-card {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        border-radius: 12px;
+        transition: transform 0.2s;
+        margin-bottom: 1rem;
+    }
+    .block-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+    .block-connector {
+        border-left: 2px dashed #9ca3af;
+        height: 20px;
+        margin-left: 12px;
+    }
+    .indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    .chain-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+    }
+    .tender-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    .block-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1rem;
+    }
+</style>
+
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-6 border-b-4 border-indigo-500 pb-2">
+        Визуализатор Блокчейна
+    </h1>
+    <p class="text-gray-600 mb-8">
+        Наглядное представление двухуровневой блокчейн-системы тендеров.
+    </p>
+
+    <!-- Global Chain Section -->
+    <div class="chain-section bg-blue-50">
+        <div class="tender-header">
+            <h2 class="text-2xl font-bold">🌐 {{ global_chain_title }}</h2>
+            <p class="text-blue-100 mt-1">Цепочка всех событий тендеров на платформе</p>
+        </div>
+        <div id="global-chain-container" class="block-grid"></div>
+    </div>
+
+    <!-- Local Chains Section -->
+    <div class="chain-section bg-green-50">
+        <div class="tender-header bg-green-600">
+            <h2 class="text-2xl font-bold">📋 Локальные Цепочки Тендеров (Chain 1)</h2>
+            <p class="text-green-100 mt-1">
+                Отдельные цепочки для каждого тендера: 1 тендер = 1 цепочка, 1 заявка = 1 блок
+                {% if local_chains_count > 0 %}
+                - Найдено {{ local_chains_count }} тендеров с активными цепочками
+                {% endif %}
+            </p>
+        </div>
+        <div id="local-chains-container"></div>
+    </div>
+</div>
+
+<script>
+    // --- GLOBAL CHAIN DATA ---
+    const globalChainData = {{ global_chain_json | safe }};
+    
+    // --- LOCAL CHAINS DATA ---
+    const localChainsData = {{ local_chains_json | safe }};
+
+    /**
+     * Determines the styling and label based on block data.
+     */
+    function getBlockTypeInfo(block) {
+        const data = block.data;
+        let bgColor = 'bg-gray-100';
+        let label = 'Системный';
+        let textColor = 'text-gray-700';
+        let icon = '⚙️';
+        
+        if (data === "Genesis Block" || (data && data.message && data.message.includes('Genesis'))) {
+            bgColor = 'bg-purple-100';
+            label = 'Генезис';
+            textColor = 'text-purple-700';
+            icon = '🌱';
+        } else if (data && typeof data === 'object') {
+            if (data.action) {
+                if (data.action.includes('Tender Created')) {
+                    bgColor = 'bg-green-100';
+                    label = 'Создание';
+                    textColor = 'text-green-700';
+                    icon = '📝';
+                } else if (data.action.includes('Bid Submitted')) {
+                    bgColor = 'bg-blue-100';
+                    label = 'Заявка';
+                    textColor = 'text-blue-700';
+                    icon = '💰';
+                } else if (data.action.includes('Awarded')) {
+                    bgColor = 'bg-yellow-100';
+                    label = 'Победитель';
+                    textColor = 'text-yellow-700';
+                    icon = '🏆';
+                } else if (data.action.includes('Closed')) {
+                    bgColor = 'bg-red-100';
+                    label = 'Закрыт';
+                    textColor = 'text-red-700';
+                    icon = '🔒';
+                } else if (data.action.includes('Deleted')) {
+                    bgColor = 'bg-gray-200';
+                    label = 'Удален';
+                    textColor = 'text-gray-600';
+                    icon = '🗑️';
+                } else if (data.action.includes('Updated')) {
+                    bgColor = 'bg-orange-100';
+                    label = 'Обновлен';
+                    textColor = 'text-orange-700';
+                    icon = '✏️';
+                }
+            }
+        }
+        return { bgColor, label, textColor, icon };
+    }
+
+    /**
+     * Formats block data into a readable format.
+     */
+    function formatData(data) {
+        if (typeof data === 'string') {
+            return `<p class="italic text-gray-700">${data}</p>`;
+        }
+        
+        // Special formatting for different action types
+        if (data && typeof data === 'object' && data.action) {
+            let formattedHtml = `<div class="space-y-2">`;
+            formattedHtml += `<p class="font-semibold text-lg ${getBlockTypeInfo({data: data}).textColor}">${data.action}</p>`;
+            
+            if (data.tender_id) {
+                formattedHtml += `<p><strong>Тендер ID:</strong> ${data.tender_id}</p>`;
+            }
+            if (data.title) {
+                formattedHtml += `<p><strong>Название:</strong> ${data.title}</p>`;
+            }
+            if (data.winner) {
+                formattedHtml += `<p><strong>Победитель:</strong> ${data.winner}</p>`;
+            }
+            if (data.final_price) {
+                formattedHtml += `<p><strong>Финальная цена:</strong> ${data.final_price}</p>`;
+            }
+            if (data.local_chain_root_hash) {
+                formattedHtml += `<p class="text-xs"><strong>Якорь:</strong> ${data.local_chain_root_hash.substring(0, 16)}...</p>`;
+            }
+            if (data.data && typeof data.data === 'object') {
+                formattedHtml += `<details class="mt-2"><summary class="cursor-pointer font-semibold">Детали данных</summary>`;
+                formattedHtml += `<pre class="text-xs mt-2 p-2 bg-white border rounded">${JSON.stringify(data.data, null, 2)}</pre>`;
+                formattedHtml += `</details>`;
+            }
+            if (data.bid_data && typeof data.bid_data === 'object') {
+                formattedHtml += `<details class="mt-2"><summary class="cursor-pointer font-semibold">Детали заявки</summary>`;
+                formattedHtml += `<pre class="text-xs mt-2 p-2 bg-white border rounded">${JSON.stringify(data.bid_data, null, 2)}</pre>`;
+                formattedHtml += `</details>`;
+            }
+            
+            formattedHtml += `</div>`;
+            return formattedHtml;
+        }
+        
+        return `<pre class="overflow-x-auto p-2 bg-white border border-gray-200 rounded text-sm text-gray-800">${JSON.stringify(data, null, 2)}</pre>`;
+    }
+
+    /**
+     * Renders a single blockchain.
+     */
+    function renderBlockchain(chainData, container, title = null) {
+        if (!chainData || chainData.length === 0) {
+            container.innerHTML = '<p class="text-red-500 text-center py-4">Цепочка блоков пуста.</p>';
+            return;
+        }
+
+        chainData.forEach((block, index) => {
+            const { bgColor, label, textColor, icon } = getBlockTypeInfo(block);
+            
+            // Add connector for all blocks except the first one
+            if (index > 0) {
+                const connector = document.createElement('div');
+                connector.className = 'block-connector';
+                container.appendChild(connector);
+            }
+
+            // Create block card
+            const blockDiv = document.createElement('div');
+            blockDiv.className = `block-card p-3 ${bgColor}`;
+
+            // Handle timestamp
+            let timestampDisplay;
+            try {
+                if (typeof block.timestamp === 'string') {
+                    timestampDisplay = new Date(block.timestamp).toLocaleString('ru-RU');
+                } else {
+                    timestampDisplay = new Date(block.timestamp * 1000).toLocaleString('ru-RU');
+                }
+            } catch (e) {
+                timestampDisplay = 'Неверный формат';
+            }
+
+            blockDiv.innerHTML = `
+                <div class="flex items-center mb-2">
+                    <span class="text-lg mr-2">${icon}</span>
+                    <h3 class="text-lg font-semibold ${textColor}">Блок #${block.index}</h3>
+                    <span class="ml-auto px-2 py-1 rounded text-xs font-medium ${textColor} border border-current">${label}</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+                    <p><strong>Время:</strong> ${timestampDisplay}</p>
+                    <p><strong>Nonce:</strong> ${block.nonce}</p>
+                </div>
+
+                <div class="space-y-1 mb-2">
+                    <p class="text-xs font-mono break-all">
+                        <strong>Hash:</strong> ${block.hash.substring(0, 20)}...
+                    </p>
+                    <p class="text-xs font-mono text-gray-500 break-all">
+                        <strong>Prev:</strong> ${block.previous_hash.substring(0, 20)}...
+                    </p>
+                </div>
+                
+                <div class="border-t pt-2">
+                    ${formatData(block.data)}
+                </div>
+            `;
+
+            container.appendChild(blockDiv);
+        });
+    }
+
+    /**
+     * Renders all local chains.
+     */
+    function renderLocalChains() {
+        const container = document.getElementById('local-chains-container');
+        container.innerHTML = '';
+        
+        if (!localChainsData || localChainsData.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <p class="text-gray-500 text-lg">Нет активных тендеров с блокчейн-цепочками</p>
+                    <p class="text-gray-400 mt-2">Создайте тендер и добавьте заявки, чтобы увидеть локальные цепочки</p>
+                </div>
+            `;
+            return;
+        }
+
+        localChainsData.forEach(chainInfo => {
+            const chainSection = document.createElement('div');
+            chainSection.className = 'mb-6 p-4 bg-white rounded-lg shadow';
+            
+            chainSection.innerHTML = `
+                <div class="flex justify-between items-center mb-3 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">${chainInfo.title}</h3>
+                        <p class="text-sm text-gray-600">
+                            Статус: ${chainInfo.tender.status} | 
+                            Заявок: ${chainInfo.bid_count} | 
+                            Блоков: ${chainInfo.chain_data.length}
+                        </p>
+                    </div>
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">Цепочка 1</span>
+                </div>
+                <div class="block-grid chain-blocks-${chainInfo.tender.id}"></div>
+            `;
+            
+            container.appendChild(chainSection);
+            renderBlockchain(chainInfo.chain_data, container.querySelector(`.chain-blocks-${chainInfo.tender.id}`));
+        });
+    }
+
+    // Render when page loads
+    window.onload = function() {
+        renderBlockchain(globalChainData, document.getElementById('global-chain-container'));
+        renderLocalChains();
+    };
+</script>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Blockchain-Тендеры{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Messages Display -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg mb-2 
+                {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-300
+                {% elif message.tags == 'error' or message.tags == 'danger' %}bg-red-100 text-red-800 border border-red-300
+                {% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-300
+                {% else %}bg-blue-100 text-blue-800 border border-blue-300{% endif %}">
+                <div class="flex justify-between items-center">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.parentElement.style.display='none'" 
+                            class="text-lg font-bold hover:text-gray-700">&times;</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold">
+                <a href="{% url 'tender_list' %}" class="text-blue-600 hover:text-blue-800 no-underline">
+                    🏗️ Blockchain-Тендеры
+                </a>
+            </h1>
+            
+            <nav class="flex items-center space-x-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                        👤 {{ user.email }}
+                    </a>
+                    {% if user.is_staff %}
+                    <a href="{% url 'admin:index' %}" class="text-red-600 hover:text-red-800 text-sm">
+                        (Админка)
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'blockchain_view' %}" class="text-cyan-600 hover:text-cyan-800 font-medium">
+                        🔗 Блокчейн
+                    </a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-600 hover:text-red-800 font-medium">
+                            🚪 Выход
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-green-600 hover:text-green-800 font-medium">
+                        🔑 Войти
+                    </a>
+                    <a href="{% url 'register' %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                        📝 Регистрация
+                    </a>
+                {% endif %}
+            </nav>
+        </header>
+
+        <hr class="border-gray-300 mb-8">
+
+        <!-- Main Content -->
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+</body>
+</html>

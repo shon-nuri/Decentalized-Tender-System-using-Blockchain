@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему</title>
+    <!-- Assuming your STATIC_URL and STATICFILES_DIRS are set correctly 
+         and style.css is in /static/css/ -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container" style="max-width: 500px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <h1 style="text-align: center; color: #333;">Вход для Участников и Администраторов</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Render the form fields (username/email and password) -->
+            {% for field in form %}
+                <div style="margin-bottom: 15px;">
+                    <label for="{{ field.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px;">
+                        {{ field.label }}
+                    </label>
+                    {{ field }} 
+                    
+                    {% for error in field.errors %}
+                        <p style="color: red; font-size: 0.9em; margin-top: 5px;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <!-- Display non-field errors (like invalid credentials) -->
+            {% if form.non_field_errors %}
+                <div style="color: red; margin-bottom: 15px; border: 1px solid red; padding: 10px; border-radius: 4px;">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 20px;">
+                Войти
+            </button>
+        </form>
+        
+        <p style="margin-top: 25px; text-align: center; padding-top: 15px;">
+            <a href="{% url 'register' %}" style="color: #28aa7f; text-decoration: none;">Создать новый аккаунт</a>
+        </p>
+    </div>
+</body>
+</html>

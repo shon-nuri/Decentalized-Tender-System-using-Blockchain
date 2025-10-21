@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система Тендеров | Главная</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h1 class="header-title" style="border-bottom: none; margin-bottom: 0;">
+                Blockchain-Тендеры
+            </h1>
+            <nav>
+                {% if user.is_authenticated %}
+                    <span style="margin-right: 15px; color: #007bff;">
+                        Привет, {{ user.email }}! 
+                        {% if user.is_staff %}
+                            (Админ) 
+                            <a href="{% url 'admin:index' %}" style="margin-left: 10px; color: #dc3545; text-decoration: none;">| Админка</a>
+                        {% endif %}
+                    </span>
+                    <a href="{% url 'logout' %}" style="color: #dc3545; text-decoration: none;">Выход</a>
+                {% else %}
+                    <a href="{% url 'login' %}" style="margin-right: 15px; color: #28a745; text-decoration: none;">Войти</a>
+                    <a href="{% url 'register' %}" style="color: #007bff; text-decoration: none;">Регистрация</a>
+                {% endif %}
+            </nav>
+        </header>
+        
+        <hr style="border-color: #ccc; margin-bottom: 30px;">
+
+        {% if user.is_authenticated %}
+            <!-- Authenticated User Content -->
+            <section style="margin-bottom: 30px;">
+                <h2 style="color: #555; margin-bottom: 15px;">
+                    Ваши Действия
+                </h2>
+                
+                <p>Вы вошли как **{{ user.company_name|default:user.email }}**.</p>
+                
+                {% if user.is_staff %}
+                    <div style="background-color: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                        <p>Как **Администратор**, вы можете просматривать и создавать все тендеры, а также управлять пользователями через Админку.</p>
+                    </div>
+                {% endif %}
+                
+                <button class="main-button" onclick="alert('TODO: Implement AJAX call to /api/tenders/')" style="margin-top: 20px;">
+                    Создать Новый Тендер (API)
+                </button>
+            </section>
+            
+            <!-- List Tenders Placeholder -->
+            <section>
+                <h2 style="color: #555; margin-bottom: 15px;">
+                    Список Активных Тендеров
+                </h2>
+                <div style="background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 5px;">
+                    <p>Здесь будут отображаться тендеры, полученные через API: <a href="/api/tenders/" target="_blank" style="color: #856404;">/api/tenders/</a></p>
+                </div>
+            </section>
+
+        {% else %}
+            <!-- Anonymous User Content -->
+            <div style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 10px;">
+                <h2 style="color: #dc3545;">Доступ ограничен</h2>
+                <p style="font-size: 1.1em; color: #666; margin-top: 15px;">Пожалуйста, <a href="{% url 'login' %}" style="color: #007bff; text-decoration: none; font-weight: bold;">войдите</a> или <a href="{% url 'register' %}" style="color: #28a745; text-decoration: none; font-weight: bold;">зарегистрируйтесь</a>, чтобы просматривать тендеры и участвовать в них.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>

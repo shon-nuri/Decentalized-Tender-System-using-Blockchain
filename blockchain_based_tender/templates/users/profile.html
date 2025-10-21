@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow rounded-lg">
+        <!-- Profile Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-t-lg text-white">
+            <div class="flex items-center space-x-4">
+                {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" alt="Avatar" class="w-20 h-20 rounded-full border-4 border-white">
+                {% else %}
+                <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <span class="text-2xl font-bold">{{ user.username|first|upper }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h1 class="text-2xl font-bold">{{ user.username }}</h1>
+                    <p class="text-blue-100">{{ user.company_name }}</p>
+                    <p class="text-blue-100 text-sm">{{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Actions -->
+        <div class="p-4 border-b flex space-x-4">
+            <a href="{% url 'profile_update' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                Edit Profile
+            </a>
+            <a href="{% url 'change_password' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                Change Password
+            </a>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Personal Information -->
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Personal Information</h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="font-semibold text-gray-600">Username:</label>
+                        <p class="text-gray-800">{{ user.username }}</p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">Email:</label>
+                        <p class="text-gray-800">{{ user.email }}</p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">Contact Number:</label>
+                        <p class="text-gray-800">{{ user.contact_number|default:"Not provided" }}</p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">Member since:</label>
+                        <p class="text-gray-800">{{ user.date_joined|date:"F j, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Information -->
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Company Information</h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="font-semibold text-gray-600">Company Name:</label>
+                        <p class="text-gray-800">{{ user.company_name|default:"Not provided" }}</p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">Tax ID:</label>
+                        <p class="text-gray-800">{{ user.tax_id|default:"Not provided" }}</p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">Website:</label>
+                        <p class="text-gray-800">
+                            {% if user.website %}
+                            <a href="{{ user.website }}" target="_blank" class="text-blue-500 hover:underline">{{ user.website }}</a>
+                            {% else %}Not provided{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">Address:</label>
+                        <p class="text-gray-800">{{ user.address|default:"Not provided"|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bio -->
+            {% if user.bio %}
+            <div class="md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Company Description</h2>
+                <p class="text-gray-800 bg-gray-50 p-4 rounded">{{ user.bio|linebreaks }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Statistics -->
+        <div class="p-6 border-t">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Tender Statistics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-blue-50 p-4 rounded text-center">
+                    <div class="text-2xl font-bold text-blue-600">{{ user.get_active_bids.count }}</div>
+                    <div class="text-gray-600">Active Bids</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded text-center">
+                    <div class="text-2xl font-bold text-green-600">{{ user.get_won_tenders.count }}</div>
+                    <div class="text-gray-600">Won Tenders</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded text-center">
+                    <div class="text-2xl font-bold text-purple-600">{{ user.bids.count }}</div>
+                    <div class="text-gray-600">Total Bids</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
