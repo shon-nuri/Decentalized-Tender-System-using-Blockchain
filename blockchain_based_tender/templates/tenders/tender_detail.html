@@ -12,21 +12,10 @@
         </h1>
         
         <!-- СТАТУС ТЕНДЕРА И ПРЕДУПРЕЖДЕНИЯ -->
-        {% with status_classes='bg-gray-100 border-gray-600 text-gray-800' %}
-            {% if tender.status == 'active' %}
-                {% with status_classes='bg-green-50 border-green-600 text-green-800' icon_svg='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-green-600"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' %}
-                {% endwith %}
-            {% elif tender.status == 'closed' %} 
-                {% with status_classes='bg-yellow-50 border-yellow-600 text-yellow-800' icon_svg='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-yellow-600"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>' %}
-                {% endwith %}
-            {% elif tender.status == 'awarded' %} 
-                {% with status_classes='bg-blue-50 border-blue-600 text-blue-800' icon_svg='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-600"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' %}
-                {% endwith %}
-            {% endif %}
-        
-            <div class="mb-8 p-5 rounded-xl shadow-lg border-l-8 {{ status_classes }}">
+        {% if tender.status == 'active' %}
+            <div class="mb-8 p-5 rounded-xl shadow-lg border-l-8 bg-green-50 border-green-600 text-green-800">
                 <p class="font-bold text-xl flex items-center">
-                    {% autoescape off %}{{ icon_svg }}{% endautoescape off %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-green-600"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     Статус: <span class="uppercase ml-2 font-extrabold">{{ tender.get_status_display }}</span>
                 </p>
                 <p class="text-sm mt-2 text-gray-700">
@@ -34,7 +23,29 @@
                     (Дата: {{ tender.created_at|date:"d.m.Y H:i" }})
                 </p>
             </div>
-        {% endwith %}
+        {% elif tender.status == 'closed' %}
+            <div class="mb-8 p-5 rounded-xl shadow-lg border-l-8 bg-yellow-50 border-yellow-600 text-yellow-800">
+                <p class="font-bold text-xl flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-yellow-600"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Статус: <span class="uppercase ml-2 font-extrabold">{{ tender.get_status_display }}</span>
+                </p>
+                <p class="text-sm mt-2 text-gray-700">
+                    <span class="font-medium">Создан: **{{ tender.creator.username }}**</span> 
+                    (Дата: {{ tender.created_at|date:"d.m.Y H:i" }})
+                </p>
+            </div>
+        {% elif tender.status == 'awarded' %}
+            <div class="mb-8 p-5 rounded-xl shadow-lg border-l-8 bg-blue-50 border-blue-600 text-blue-800">
+                <p class="font-bold text-xl flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-600"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Статус: <span class="uppercase ml-2 font-extrabold">{{ tender.get_status_display }}</span>
+                </p>
+                <p class="text-sm mt-2 text-gray-700">
+                    <span class="font-medium">Создан: **{{ tender.creator.username }}**</span> 
+                    (Дата: {{ tender.created_at|date:"d.m.Y H:i" }})
+                </p>
+            </div>
+        {% endif %}
 
         <!-- ИНФОРМАЦИЯ О ПОБЕДИТЕЛЕ (ТОЛЬКО ЕСЛИ НАГРАЖДЕН) -->
         {% if tender.status == 'awarded' and winner_bid %}
@@ -48,13 +59,65 @@
                 <p class="text-lg">
                     <strong>Окончательная Цена:</strong> 
                     <span class="font-extrabold text-2xl text-green-700">{{ winner_bid.price }}</span> 
-                    ({{ tender.get_budget_currency_display }})
+                    (USD)
                 </p>
             </div>
             <p class="text-sm mt-3 text-indigo-700 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-1"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M12 17V7"></path><path d="M9 13H7"></path><path d="M17 13H15"></path></svg>
                 Решение запечатано в блокчейне.
             </p>
+        </div>
+        {% endif %}
+
+        <!-- CONTRACT DOWNLOAD SECTION FOR WINNER -->
+        {% if tender.status == 'awarded' and winner_bid and user == winner_bid.bidder %}
+        <div class="bg-green-50 border-l-8 border-green-600 text-green-800 p-6 rounded-xl mb-8 shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 flex items-center text-green-900">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-green-700">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Ваш Контракт Готов!
+            </h2>
+            <p class="text-lg mb-4">Поздравляем! Вы выиграли этот тендер. Скачайте ваш контракт:</p>
+            <a href="{% url 'download_contract' tender.pk %}" 
+               class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-200 inline-flex items-center text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                📄 Скачать Контракт PDF
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- CONTRACT DOWNLOAD SECTION FOR CREATOR -->
+        {% if tender.status == 'awarded' and winner_bid and user == tender.creator %}
+        <div class="bg-blue-50 border-l-8 border-blue-600 text-blue-800 p-6 rounded-xl mb-8 shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 flex items-center text-blue-900">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-700">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Контракт Победителя
+            </h2>
+            <p class="text-lg mb-4">Тендер завершен. Скачайте контракт с победителем:</p>
+            <a href="{% url 'download_contract' tender.pk %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-200 inline-flex items-center text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                📄 Скачать Контракт PDF
+            </a>
         </div>
         {% endif %}
 
@@ -78,7 +141,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-1 text-blue-600"><path d="M12 20h.01"></path><path d="M12 16h.01"></path><path d="M12 12h.01"></path><path d="M12 8h.01"></path><path d="M12 4h.01"></path></svg>
                         Максимальный Бюджет
                     </strong>
-                    <p class="text-2xl font-extrabold text-blue-700">{{ tender.budget }} <span class="text-xl font-semibold text-blue-500">{{ tender.get_budget_currency_display }}</span></p>
+                    <p class="text-2xl font-extrabold text-blue-700">{{ tender.budget }} <span class="text-xl font-semibold text-blue-500">USD</span></p>
                 </div>
                 <div class="flex flex-col p-3 bg-red-50 rounded-lg">
                     <strong class="text-gray-600 mb-1 flex items-center text-sm">
@@ -104,7 +167,6 @@
                     {% for field in tender_form %}
                     <div class="mb-5">
                         <label for="{{ field.id_for_label }}" class="block text-gray-700 text-base font-medium mb-2">{{ field.label }}:</label>
-                        <!-- ПРЕДЛОЖЕНИЕ: Добавьте следующие классы к полям формы через виджеты Django -->
                         {{ field }}
                         {% for error in field.errors %}
                             <p class="text-red-600 text-sm italic mt-1 flex items-center">
@@ -120,12 +182,12 @@
                     </button>
                     {% if not tender.bids.exists %}
                         <a href="{% url 'tender_delete' tender.pk %}" 
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded ml-4">
                             Удалить тендер
                         </a>
                         {% else %}
                         <button disabled 
-                                class="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed"
+                                class="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed ml-4"
                                 title="Нельзя удалить тендер с заявками">
                             Удалить тендер
                         </button>
@@ -156,7 +218,7 @@
                                 <th class="px-6 py-4 text-left text-xs font-extrabold text-indigo-800 uppercase tracking-wider">Предложение</th>
                                 <th class="px-6 py-4 text-left text-xs font-extrabold text-indigo-800 uppercase tracking-wider">Дата</th>
                                 {% if tender.status == 'awarded' %}
-                                <th class="px-6 py-4 text-left text-xs font-extrabold text-indigo-800 uppercase tracking-wider rounded-tr-lg">Статус</th>
+                                <th class="px-6 py-4 text-left text-xs font-extrabold text-indigo-800 uppercase tracking-wider rounded-tr-lg">Контракт</th>
                                 {% endif %}
                             </tr>
                         </thead>
@@ -169,17 +231,26 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ bid.bidder.username }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-base font-bold 
                                     {% if tender.status == 'awarded' and bid == winner_bid %} text-green-700 {% else %} text-gray-800 {% endif %}">
-                                    {{ bid.price }} {{ tender.get_budget_currency_display }}
+                                    {{ bid.price }} USD
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ bid.proposal|truncatechars:50 }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ bid.timestamp|date:"d.m.Y H:i" }}</td>
                                 {% if tender.status == 'awarded' %}
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    {% if tender.status == 'awarded' and winner_bid and user == tender.creator or user == winner_bid.bidder %}
-                                        <a href="{% url 'download_contract' tender.pk %}" 
-                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">
-                                            📄 Контракт
-                                        </a>
+                                    {% if bid == winner_bid %}
+                                        {% if user == tender.creator or user == winner_bid.bidder %}
+                                            <a href="{% url 'download_contract' tender.pk %}" 
+                                               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition duration-200 flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2">
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                                </svg>
+                                                📄 Контракт
+                                            </a>
+                                        {% else %}
+                                            <span class="text-gray-400 text-sm">Победитель</span>
+                                        {% endif %}
                                     {% else %}
                                         <span class="text-gray-400">—</span>
                                     {% endif %}
@@ -212,7 +283,6 @@
                         {% for field in bid_form %}
                         <div class="mb-5">
                             <label for="{{ field.id_for_label }}" class="block text-gray-700 text-base font-medium mb-2">{{ field.label }}:</label>
-                            <!-- ПРЕДЛОЖЕНИЕ: Добавьте следующие классы к полям формы через виджеты Django -->
                             {{ field }}
                             {% for error in field.errors %}
                                 <p class="text-red-600 text-sm italic mt-1 flex items-center">

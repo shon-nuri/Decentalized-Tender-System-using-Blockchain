@@ -76,6 +76,29 @@ class Tender(models.Model):
         blockchain = self.get_blockchain_instance()
         # Возвращаем хэш последнего блока
         return blockchain.chain[-1].hash if blockchain.chain else '0'
+    
+    # In Tender model, add this method
+    def get_budget_currency_display(self):
+        """Return currency display for budget"""
+        return "USD"  # Or add a currency field to your model
+
+    # Optional: Add currency field to your Tender model
+    CURRENCY_CHOICES = [
+        ('USD', 'USD ($)'),
+        ('EUR', 'EUR (€)'),
+        ('RUB', 'RUB (₽)'),
+        ('UZS', 'UZS (сум)'),
+    ]
+
+    # Add this field to your Tender model (optional but recommended)
+    currency = models.CharField(
+        max_length=3, 
+        choices=CURRENCY_CHOICES, 
+        default='USD',
+        verbose_name="Валюта",
+        blank=True,
+        null=True
+    )
     # ---------------------------------
 
 # === NEW MODEL: Bid ===

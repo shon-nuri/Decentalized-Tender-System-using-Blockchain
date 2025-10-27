@@ -219,5 +219,108 @@
         "previous_hash": "006385b9c87ecd1b3c710e4ab6efad24f76f52b59d68ac0f55858cecc6deada4",
         "hash": "009388317cf4dccf830bbfdc9b78486da2d132516253c2375218ca138223e6ac",
         "nonce": 68
+    },
+    {
+        "index": 17,
+        "timestamp": 1761045428.0296125,
+        "data": {
+            "action": "Tender Created (Global)",
+            "tender_id": 16,
+            "title": "Toyota Camry 2005",
+            "local_chain_root_hash": "00dc9aa07d500e9245101fcd228dbf377f84818dbbdbe45cfd38601f8a6343f1"
+        },
+        "previous_hash": "009388317cf4dccf830bbfdc9b78486da2d132516253c2375218ca138223e6ac",
+        "hash": "00bf22e0181300ce23b2cad0d221a175fe3fbbd74b1a728f7102b9803ea0ba0a",
+        "nonce": 406
+    },
+    {
+        "index": 18,
+        "timestamp": 1761046543.845584,
+        "data": {
+            "action": "Tender Closed (Global)",
+            "tender_id": 16,
+            "local_chain_root_hash": "002b5f8ce1f842407e4882c0939e795e42feca70998774de542e950bc78afdc1"
+        },
+        "previous_hash": "00bf22e0181300ce23b2cad0d221a175fe3fbbd74b1a728f7102b9803ea0ba0a",
+        "hash": "002bcf2c81418dd68daa4240a72e9b0debee4794713bc3722bc4ffebf15a0e01",
+        "nonce": 99
+    },
+    {
+        "index": 19,
+        "timestamp": 1761047790.6543396,
+        "data": {
+            "action": "Tender Created (Global)",
+            "tender_id": 1,
+            "title": "begaly",
+            "local_chain_root_hash": "00e6fb49d933160d14ae995f70662fa54b0c550e96022177a632e438d320019e"
+        },
+        "previous_hash": "002bcf2c81418dd68daa4240a72e9b0debee4794713bc3722bc4ffebf15a0e01",
+        "hash": "008fa742270d8396d486e6836becf0ae3f73960beacf31551a8f7e406f1a9401",
+        "nonce": 39
+    },
+    {
+        "index": 20,
+        "timestamp": 1761048013.6400578,
+        "data": {
+            "action": "Tender Closed (Global)",
+            "tender_id": 1,
+            "local_chain_root_hash": "005f337332d5d05d6889629851c373c0d3e332dbbce7da1acc823293a7bb8810"
+        },
+        "previous_hash": "008fa742270d8396d486e6836becf0ae3f73960beacf31551a8f7e406f1a9401",
+        "hash": "009171dfb57f71620493d0e40bb4c6d61571d50b9fc35272e74fd3a7e2d9f2a3",
+        "nonce": 368
+    },
+    {
+        "index": 21,
+        "timestamp": 1761048013.699491,
+        "data": {
+            "action": "Tender Awarded (Global)",
+            "tender_id": 1,
+            "winner": "begaly",
+            "final_price": "234566.00",
+            "local_chain_root_hash": "00b5fc5833ab5c9c475782e12de3c7792154b83f65631a2d28b3d70f82c75c17"
+        },
+        "previous_hash": "009171dfb57f71620493d0e40bb4c6d61571d50b9fc35272e74fd3a7e2d9f2a3",
+        "hash": "008dae55be002348c86bcd2dca2b787a631fa68b146faacb3f568bdf7e3099e1",
+        "nonce": 1168
+    },
+    {
+        "index": 22,
+        "timestamp": 1761547664.6419723,
+        "data": {
+            "action": "Tender Created (Global)",
+            "tender_id": 2,
+            "title": "test",
+            "local_chain_root_hash": "00d651addc4c4ab879b13e94553c494d6705789c265a86cbb82ef1fc453a9697"
+        },
+        "previous_hash": "008dae55be002348c86bcd2dca2b787a631fa68b146faacb3f568bdf7e3099e1",
+        "hash": "00a1860337429b177726575f12e6b36325f05cf493d905c88470cf22b66ab628",
+        "nonce": 223
+    },
+    {
+        "index": 23,
+        "timestamp": 1761547748.0868092,
+        "data": {
+            "action": "Tender Closed (Global)",
+            "tender_id": 2,
+            "local_chain_root_hash": "008dd477657d6004e93e626e9bca8912c40bac42267e2a6ae5db7f13d0ff7cc4"
+        },
+        "previous_hash": "00a1860337429b177726575f12e6b36325f05cf493d905c88470cf22b66ab628",
+        "hash": "0064d28f8abfffa339088f888b6f0e9e550e480623ed1b3f28a3298165d4da1f",
+        "nonce": 137
+    },
+    {
+        "index": 24,
+        "timestamp": 1761547748.1536155,
+        "data": {
+            "action": "Tender Awarded (Global)",
+            "tender_id": 2,
+            "winner": "sss",
+            "final_price": "0.06",
+            "local_chain_root_hash": "00daa74331d8337c86fc6f095ddfa34c9ffc921fbd35593e72c4cd9974c6beb9"
+        },
+        "previous_hash": "0064d28f8abfffa339088f888b6f0e9e550e480623ed1b3f28a3298165d4da1f",
+        "hash": "0094a6a74dd95821a5a318e4fad4ab55d7ab0b8d98916736b5cdc045b0fb40c9",
+        "nonce": 257
     }
 ]
