@@ -28,6 +28,10 @@ class Bidder(AbstractUser):
     USERNAME_FIELD = 'email'  # Fixed typo
     REQUIRED_FIELDS = ['username']
 
+    # --- MFA (TOTP) fields ---
+    otp_secret = models.CharField(max_length=64, blank=True, null=True, help_text='Base32 secret for TOTP')
+    mfa_enabled = models.BooleanField(default=False, help_text='Whether user has MFA enabled')
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='bidder_set',
@@ -63,3 +67,24 @@ class Bidder(AbstractUser):
             tender__status='active'
         )
     
+    def generate_totp_secret(self):
+        """Generate and store a new base32 secret for TOTP."""
+        try:
+            import pyotp
+        except Exception:
+            return None
+        secret = pyotp.random_base32()
+        self.otp_secret = secret
+        self.save(update_fields=['otp_secret'])
+        return secret
+
+    def get_totp_uri(self, issuer_name='BlockchainTender'):
+        """Return provisioning URI for authenticator apps."""
+        try:
+            import pyotp
+        except Exception:
+            return None
+        if not self.otp_secret:
+            return None
+        return pyotp.totp.TOTP(self.otp_secret).provisioning_uri(name=self.email or self.username, issuer_name=issuer_name)
+

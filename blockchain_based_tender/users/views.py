@@ -11,6 +11,13 @@ from .forms import BidderCreationForm, BidderChangeForm, ProfileUpdateForm, Pass
 from .models import Bidder
 from .serializers import BidderSerializer, BidderProfileUpdateSerializer, ChangePasswordSerializer
 
+# MFA imports
+import pyotp
+import qrcode
+import io
+import base64
+from .forms import TOTPVerifyForm
+
 # === TEMPLATE VIEWS ===
 
 def register(request):
@@ -61,6 +68,77 @@ def change_password(request):
         form = PasswordChangeForm(request.user)
     
     return render(request, 'users/change_password.html', {'form': form})
+
+
+@login_required
+def mfa_setup(request):
+    """Set up TOTP MFA: show QR and verify initial code."""
+    user = request.user
+    # Generate secret if not present
+    if not user.otp_secret:
+        user.generate_totp_secret()
+
+    provisioning_uri = user.get_totp_uri()
+
+    # Generate QR code image
+    qr_b64 = None
+    if provisioning_uri:
+        qr = qrcode.make(provisioning_uri)
+        buffered = io.BytesIO()
+        qr.save(buffered, format='PNG')
+        qr_b64 = base64.b64encode(buffered.getvalue()).decode()
+
+    if request.method == 'POST':
+        form = TOTPVerifyForm(request.POST)
+        if form.is_valid():
+            code = form.cleaned_data['code']
+            totp = pyotp.TOTP(user.otp_secret)
+            if totp.verify(code):
+                user.mfa_enabled = True
+                user.save(update_fields=['mfa_enabled'])
+                request.session['mfa_verified'] = True
+                messages.success(request, 'MFA enabled successfully.')
+                return redirect('profile')
+            else:
+                messages.error(request, 'Invalid code. Please try again.')
+    else:
+        form = TOTPVerifyForm()
+
+    return render(request, 'users/mfa_setup.html', {'form': form, 'qr_b64': qr_b64, 'secret': user.otp_secret})
+
+
+@login_required
+def mfa_verify(request):
+    """Verify TOTP during login flow when MFA is required."""
+    user = request.user
+    if request.method == 'POST':
+        form = TOTPVerifyForm(request.POST)
+        if form.is_valid():
+            code = form.cleaned_data['code']
+            totp = pyotp.TOTP(user.otp_secret)
+            if totp.verify(code):
+                request.session['mfa_verified'] = True
+                messages.success(request, 'MFA verification successful.')
+                return redirect('tender_list')
+            else:
+                messages.error(request, 'Invalid code. Try again.')
+    else:
+        form = TOTPVerifyForm()
+
+    return render(request, 'users/mfa_verify.html', {'form': form})
+
+
+@login_required
+def mfa_disable(request):
+    user = request.user
+    if request.method == 'POST':
+        user.mfa_enabled = False
+        user.otp_secret = ''
+        user.save(update_fields=['mfa_enabled', 'otp_secret'])
+        request.session.pop('mfa_verified', None)
+        messages.success(request, 'MFA disabled for your account.')
+        return redirect('profile')
+    return render(request, 'users/mfa_disable.html')
 
 # === API VIEWS (DRF) ===
 

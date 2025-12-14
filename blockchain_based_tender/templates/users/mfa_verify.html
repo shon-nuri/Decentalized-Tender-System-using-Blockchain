@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mfa-container">
+    <h2>MFA Verification</h2>
+    <p>Please enter the 6-digit code from your authenticator app.</p>
+    <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Verify</button>
+    </form>
+</div>
+{% endblock %}

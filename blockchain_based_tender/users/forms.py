@@ -38,3 +38,11 @@ class PasswordChangeForm(PasswordChangeForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         label="Confirm New Password"
     )
+
+
+class TOTPVerifyForm(forms.Form):
+    code = forms.CharField(
+        max_length=6,
+        label='Authentication Code',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter 6-digit code'})
+    )

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mfa-container">
+    <h2>Set up MFA (Authenticator)</h2>
+    {% if qr_b64 %}
+        <p>Scan this QR code with your authenticator app (Google Authenticator, Authy):</p>
+        <img class="mfa-qr" src="data:image/png;base64,{{ qr_b64 }}" alt="QR code">
+        <p>Or enter this secret manually: <span class="mfa-secret">{{ secret }}</span></p>
+    {% endif %}
+    <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Verify & Enable</button>
+    </form>
+</div>
+{% endblock %}

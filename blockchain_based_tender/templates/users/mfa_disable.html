@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mfa-container">
+    <h2>Disable MFA</h2>
+    <p>Are you sure you want to disable MFA for your account?</p>
+    <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Disable MFA</button>
+            <a href="{% url 'profile' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

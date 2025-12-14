@@ -9,7 +9,7 @@ class BidderAdmin(UserAdmin):
     model = Bidder
     list_display = ['username', 'email', 'company_name', 'contact_number', 'is_staff', 'is_active']
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('company_name',)}),
+        (None, {'fields': ('company_name', 'mfa_enabled', 'otp_secret')}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
         (None, {'fields': ('company_name',)}),

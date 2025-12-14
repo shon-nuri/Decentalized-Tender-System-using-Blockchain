@@ -36,3 +36,98 @@ body {
 .main-button:hover {
     background-color: #218838;
 }
+
+/* MFA and form improvements */
+.mfa-container {
+    max-width: 520px;
+    margin: 30px auto;
+    padding: 24px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    box-shadow: 0 6px 18px rgba(30, 41, 59, 0.06);
+}
+
+.mfa-container h2 {
+    color: #0b4a6f;
+    margin-bottom: 12px;
+}
+
+/* Form controls */
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d6e0ea;
+    border-radius: 6px;
+    background-color: #fcfeff;
+    color: #0f1724;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+input:focus, .form-control:focus, textarea:focus {
+    outline: none;
+    border-color: #6bb0e3;
+    box-shadow: 0 0 0 4px rgba(107,176,227,0.12);
+}
+
+/* Button variants used in templates */
+.btn {
+    display: inline-block;
+    padding: 9px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+.btn-primary:hover { background-color: #0069d9; }
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+.btn-danger:hover { background-color: #c82333; }
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
+.btn-secondary:hover { background-color: #5a6268; }
+
+.mfa-qr {
+    display: block;
+    margin: 12px 0 18px;
+    max-width: 260px;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid #e6eef7;
+    padding: 6px;
+    background: #fff;
+}
+
+.mfa-secret {
+    background: #f1f7fb;
+    padding: 8px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    font-family: monospace;
+    color: #08304a;
+}
+
+.alert {
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.alert-success { background: #e9f7ef; color: #14532d; }
+.alert-danger { background: #fff1f2; color: #7f1d1d; }
+
+/* Make MFA forms clearly centered inside container */
+.users-mfa-wrapper { display:flex; justify-content:center; }
